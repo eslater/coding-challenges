@@ -7,6 +7,7 @@ class JsonParser {
         getNextTokenAndFailIfNotType(tokenItr, TokenType.LEFT_BRACKET)
         val parsed = JsonObject()
         val keyValueMap: MutableMap<String, JsonValue> = mutableMapOf()
+        var lastTokenType: TokenType? = null
         while (tokenItr.hasNext()) {
             val token = tokenItr.next()
             if (token.type == TokenType.RIGHT_BRACKET) {
@@ -21,10 +22,13 @@ class JsonParser {
                 getNextTokenAndFailIfNotType(tokenItr, TokenType.DOUBLE_QUOTE)
                 val value = getNextTokenAndFailIfNotType(tokenItr, TokenType.STRING)
                 getNextTokenAndFailIfNotType(tokenItr, TokenType.DOUBLE_QUOTE)
-                keyValueMap.put(key.value, JsonString(value.value))
+                keyValueMap[key.value] = JsonString(value.value)
+            } else if (token.type == TokenType.COMMA && lastTokenType == TokenType.DOUBLE_QUOTE) {
+                continue
             } else {
                 throw JsonParseException("unexpected next token ${token.type}")
             }
+            lastTokenType = token.type;
         }
         return parsed
     }
@@ -42,7 +46,7 @@ class JsonParser {
 
     fun tokenize(text: String): List<Token> {
         val tokens = mutableListOf<Token>()
-        var consumingWord = false
+        var buildingValue = false
         val word = StringBuilder()
         for (i in 0..<text.length) {
             val char = text[i]
@@ -56,16 +60,19 @@ class JsonParser {
                 ':' ->  {
                     Token(TokenType.COLON, char.toString())
                 }
+                ',' -> {
+                    Token(TokenType.COMMA, char.toString())
+                }
                 '"' ->  {
-                    consumingWord = !consumingWord
-                    if (!consumingWord) {
+                    buildingValue = !buildingValue
+                    if (!buildingValue) {
                         tokens.add(Token(TokenType.STRING, word.toString()))
                         word.clear()
                     }
                     Token(TokenType.DOUBLE_QUOTE, char.toString())
                 }
                 else -> {
-                    if (consumingWord) {
+                    if (buildingValue) {
                         word.append(char)
                     } else if (char.isWhitespace()) {
                         continue
@@ -84,7 +91,7 @@ class JsonParser {
 }
 
 enum class TokenType {
-    LEFT_BRACKET, RIGHT_BRACKET, COLON, DOUBLE_QUOTE, STRING
+    LEFT_BRACKET, RIGHT_BRACKET, COLON, COMMA, DOUBLE_QUOTE, STRING
 }
 
 data class Token(val type: TokenType, val value: String)
