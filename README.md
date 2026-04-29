@@ -1,1 +1,1 @@
-Solutions to various problems on https://github.com/eslater/coding-challenges
+Solutions to various problems on codingchallenges.fyi 
