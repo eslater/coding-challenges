@@ -22,8 +22,7 @@ class Tokenizer {
     private fun tokenizeObject(iterator: ListIterator<Char>): List<Token> {
         val tokens = mutableListOf<Token>()
         while (iterator.hasNext()) {
-            val char = iterator.next()
-            when (char) {
+            when (val char = iterator.next()) {
                 '{' -> {
                     tokens.add(Token(TokenType.START_OBJECT, char.toString()))
                 }
@@ -68,9 +67,6 @@ class Tokenizer {
                 ']' -> {
                     tokens.add(Token(TokenType.END_ARRAY, char.toString()))
                     return tokens
-                }
-                '"' -> {
-                    tokens.add(Token(TokenType.STRING, parseBetweenQuotes(iterator)))
                 }
                 ',' -> {
                     tokens.add(Token(TokenType.COMMA, char.toString()))
