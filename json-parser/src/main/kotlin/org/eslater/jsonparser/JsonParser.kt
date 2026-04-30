@@ -48,13 +48,13 @@ class JsonParser {
 
         fun getEscapeChar(char: Char): String {
             return when (char) {
-                '\\' -> """\\"""
-                '\'' -> """\'"""
-                '"' -> """\""""
-                'n' -> """\n"""
-                't' -> """\t"""
-                'r' -> """\r"""
-                'b' -> """\b"""
+                '\\' -> "\\"
+                '\'' -> "\'"
+                '"' -> "\""
+                'n' -> "\n"
+                't' -> "\t"
+                'r' -> "\r"
+                'b' -> "\b"
                 else -> throw JsonParseException("Unexpected escape sequence in string value")
             }
         }

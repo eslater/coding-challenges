@@ -35,7 +35,7 @@ class JsonParserTest {
             Token(TokenType.START_OBJECT, "{"),
             Token(TokenType.STRING, "key"),
             Token(TokenType.COLON, ":"),
-            Token(TokenType.STRING, """foo\"bar"""),
+            Token(TokenType.STRING, """foo"bar"""),
             Token(TokenType.END_OBJECT, "}"))
         assertEquals(expected, tokens)
     }
@@ -48,7 +48,7 @@ class JsonParserTest {
             Token(TokenType.START_OBJECT, "{"),
             Token(TokenType.STRING, "key"),
             Token(TokenType.COLON, ":"),
-            Token(TokenType.STRING, """foo\"bar\\"""),
+            Token(TokenType.STRING, """foo"bar\"""),
             Token(TokenType.END_OBJECT, "}"))
         assertEquals(expected, tokens)
     }
