@@ -2,11 +2,15 @@ package org.eslater.jsonparser
 
 class JsonParser {
 
-    fun parse(json: String): JsonObject {
+    fun parse(json: String): JsonValue {
         val tokens: List<Token> = Tokenizer().tokenize(json)
         val tokenItr = tokens.iterator()
-        getNextTokenAndFailIfNotType(tokenItr, TokenType.START_OBJECT)
-        val parsed: JsonObject = parseObject(tokenItr)
+        val startToken = getStartTokenAndFailIfNotValid(tokenItr)
+        val parsed = when (startToken.type) {
+            TokenType.START_OBJECT -> parseObject(tokenItr)
+            TokenType.START_ARRAY-> parseArray(tokenItr)
+            else -> throw JsonParseException("Invalid start token type: $startToken")
+        }
         if (tokenItr.hasNext()) throw JsonParseException("unexpected trailing tokens")
         return parsed
     }
@@ -55,6 +59,15 @@ class JsonParser {
             token = iterator.next() //either comma or end array
         }
         return JsonArray(list)
+    }
+
+    private fun getStartTokenAndFailIfNotValid(iterator: Iterator<Token>): Token {
+        if (!iterator.hasNext()) throw JsonParseException("Unexcepted end of input")
+        val token = iterator.next();
+        if (!listOf(TokenType.START_OBJECT, TokenType.START_ARRAY).contains(token.type)) {
+            throw JsonParseException("unexpected next token, expected START_OBJECT or START_ARRAY but got ${token.type}")
+        }
+        return token
     }
 
     private fun getNextTokenAndFailIfNotType(iterator: Iterator<Token>, type: TokenType): Token {

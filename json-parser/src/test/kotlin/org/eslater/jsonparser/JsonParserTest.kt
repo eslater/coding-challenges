@@ -1,10 +1,12 @@
 package org.eslater.jsonparser
 
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -21,7 +23,7 @@ class JsonParserTest {
                 JsonBoolean(true),
                 JsonBoolean(false)))))
         val parser = JsonParser()
-        val result: JsonObject = parser.parse(json)
+        val result: JsonValue = parser.parse(json)
         assertEquals(expected, result)
     }
 
@@ -29,7 +31,7 @@ class JsonParserTest {
     @MethodSource("jsonDocs")
     fun `should parse and serialize the json document`(json: String, expected: JsonObject) {
         val parser = JsonParser()
-        val result: JsonObject = parser.parse(json)
+        val result: JsonValue = parser.parse(json)
         assertEquals(expected, result)
     }
 
@@ -118,8 +120,73 @@ class JsonParserTest {
                                 JsonBoolean(true),
                                 JsonBoolean(false)))))))))))))
 
-        val result: JsonObject = JsonParser().parse(json)
+        val result: JsonValue = JsonParser().parse(json)
         assertEquals(expected, result)
     }
 
+    @Test
+    fun `should parse json array as the start token`() {
+        val json = "[\"foo\", 123, null, true, false]"
+        val expected = JsonArray(mutableListOf(
+            JsonString("foo"),
+            JsonNumber(123),
+            JsonNull(),
+            JsonBoolean(true),
+            JsonBoolean(false)))
+        val parser = JsonParser()
+        val result: JsonValue = parser.parse(json)
+        assertEquals(expected, result)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "fail1.json",
+        "fail2.json",
+        "fail3.json",
+        "fail4.json",
+        "fail5.json",
+        "fail6.json",
+        "fail7.json",
+        "fail8.json",
+        "fail9.json",
+        "fail10.json",
+        "fail11.json",
+        "fail12.json",
+        "fail13.json",
+        "fail14.json",
+        "fail15.json",
+        "fail16.json",
+        "fail17.json",
+        "fail18.json",
+        "fail19.json",
+        "fail20.json",
+        "fail21.json",
+        "fail22.json",
+        "fail23.json",
+        "fail24.json",
+        "fail25.json",
+        "fail26.json",
+        "fail27.json",
+        "fail28.json",
+        "fail29.json",
+        "fail30.json",
+        "fail31.json",
+        "fail32.json",
+        "fail33.json",
+        "pass1.json",
+        "pass2.json",
+        "pass3.json"
+    ])
+    fun `JSON dot org test`(fileName: String) {
+        val text = File("src/test/resources/jsonorgtest/$fileName").readText()
+        if (fileName.contains("pass")) {
+            assertDoesNotThrow {
+                JsonParser().parse(text)
+            }
+        } else {
+            assertThrows<JsonParseException> {
+                JsonParser().parse(text)
+            }
+        }
+    }
 }

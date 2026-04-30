@@ -25,6 +25,23 @@ class TokenizerTest {
     }
 
     @Test
+    fun `should handle array as start token`() {
+        val json = "[\"foo\",\"bar\", true, 123]"
+        var tokens: List<Token> = Tokenizer().tokenize(json)
+        var expected: List<Token> = listOf(
+            Token(TokenType.START_ARRAY, "["),
+            Token(TokenType.STRING, "foo"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.STRING, "bar"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.BOOL, "true"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.NUMBER, "123"),
+            Token(TokenType.END_ARRAY, "]"))
+        assertEquals(expected, tokens)
+    }
+
+    @Test
     fun `should handle escaped quotes in a string`() {
         val json = "{\"key\":\"foo\\\"bar\"}"
         var tokens: List<Token> = Tokenizer().tokenize(json)

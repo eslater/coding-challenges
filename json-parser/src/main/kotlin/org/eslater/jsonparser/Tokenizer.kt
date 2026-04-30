@@ -3,8 +3,21 @@ package org.eslater.jsonparser
 class Tokenizer {
 
     fun tokenize(text: String): List<Token> {
-        val iterator: ListIterator<Char> = text.toList().listIterator()
-        val tokens: List<Token> = tokenizeObject(iterator)
+        val iterator: ListIterator<Char> = text.trimStart().toList().listIterator()
+        val char = iterator.next()
+        val tokens = when (char) {
+            '{' -> {
+                iterator.previous()
+                tokenizeObject(iterator)
+            }
+            '[' -> {
+                buildList {
+                    add(Token(TokenType.START_ARRAY, "["))
+                    addAll(tokenizeArray(iterator))
+                }
+            }
+            else -> throw JsonParseException("unexpected start character")
+        }
         checkRemainingCharactersAndErrorIfNotWhiteSpace(iterator)
         return tokens
     }
