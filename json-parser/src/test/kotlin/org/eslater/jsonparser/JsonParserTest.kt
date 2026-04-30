@@ -18,10 +18,11 @@ class JsonParserTest {
     fun `should tokenize the input`(json: String) {
         var tokens: List<Token> = JsonParser().tokenize(json)
         var expected: List<Token> = listOf(
-            Token(TokenType.LEFT_BRACKET, "{"),
-            Token(TokenType.KEY, "key"),
-            Token(TokenType.STRING_VALUE, "value"),
-            Token(TokenType.RIGHT_BRACKET, "}"))
+            Token(TokenType.START_OBJECT, "{"),
+            Token(TokenType.STRING, "key"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.STRING, "value"),
+            Token(TokenType.END_OBJECT, "}"))
             assertEquals(expected, tokens)
     }
 
@@ -30,7 +31,7 @@ class JsonParserTest {
     fun `should parse and serialize the json document`(json: String, expected: JsonObject) {
         val parser = JsonParser()
         val result: JsonObject = parser.parse(json)
-        assertEquals(result, expected)
+        assertEquals(expected, result)
     }
 
     companion object {
