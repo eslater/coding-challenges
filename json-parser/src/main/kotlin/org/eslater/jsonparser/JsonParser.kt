@@ -46,13 +46,35 @@ class JsonParser {
         val iterator: Iterator<Char> = text.iterator()
         val word = StringBuilder()
 
+        fun getEscapeChar(char: Char): String {
+            return when (char) {
+                '\\' -> """\\"""
+                '\'' -> """\'"""
+                '"' -> """\""""
+                'n' -> """\n"""
+                't' -> """\t"""
+                'r' -> """\r"""
+                'b' -> """\b"""
+                else -> throw JsonParseException("Unexpected escape sequence in string value")
+            }
+        }
+
         fun parseBetweenQuotes(): String {
             var value = StringBuilder()
             while (iterator.hasNext()) {
                 val char = iterator.next()
-                if (char == '"')
-                    break;
-                value.append(char)
+                when(char) {
+                    '\\' -> {
+                        if (!iterator.hasNext()) throw JsonParseException("Unexpected end of input")
+                        value.append(getEscapeChar(iterator.next()))
+                    }
+                    '"' -> {
+                        break
+                    }
+                    else -> {
+                        value.append(char)
+                    }
+                }
             }
             return value.toString()
         }

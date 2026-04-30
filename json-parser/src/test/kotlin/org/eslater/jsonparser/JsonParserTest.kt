@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class JsonParserTest {
@@ -24,6 +25,32 @@ class JsonParserTest {
             Token(TokenType.STRING, "value"),
             Token(TokenType.END_OBJECT, "}"))
             assertEquals(expected, tokens)
+    }
+
+    @Test
+    fun `should handle escaped quotes in a string`() {
+        val json = "{\"key\":\"foo\\\"bar\"}"
+        var tokens: List<Token> = JsonParser().tokenize(json)
+        var expected: List<Token> = listOf(
+            Token(TokenType.START_OBJECT, "{"),
+            Token(TokenType.STRING, "key"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.STRING, """foo\"bar"""),
+            Token(TokenType.END_OBJECT, "}"))
+        assertEquals(expected, tokens)
+    }
+
+    @Test
+    fun `should handle escaped quotes in a string and escaped backslashes at end`() {
+        val json = """{"key":"foo\"bar\\"}"""
+        var tokens: List<Token> = JsonParser().tokenize(json)
+        var expected: List<Token> = listOf(
+            Token(TokenType.START_OBJECT, "{"),
+            Token(TokenType.STRING, "key"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.STRING, """foo\"bar\\"""),
+            Token(TokenType.END_OBJECT, "}"))
+        assertEquals(expected, tokens)
     }
 
     @ParameterizedTest
