@@ -13,7 +13,7 @@ class JsonParserTest {
     @ValueSource(strings = [
         "{\"key\":\"value\"}",
         "{   \"key\":\"value\"    }",
-        "   {\"key\":\"value\"}  ",
+        "   {\"key\":\"value\"}  "
     ])
     fun `should tokenize the input`(json: String) {
         var tokens: List<Token> = JsonParser().tokenize(json)
@@ -42,7 +42,14 @@ class JsonParserTest {
             Arguments.of( "{\"key\":\"\"}",
                 JsonObject(mutableMapOf("key" to JsonString("")))),
             Arguments.of( "{\"key\":\"value\",\"foo\":\"bar\"}",
-                JsonObject(mutableMapOf("key" to JsonString("value"), "foo" to JsonString("bar"))))
+                JsonObject(mutableMapOf("key" to JsonString("value"), "foo" to JsonString("bar")))),
+            Arguments.of("{\"key1\": true,\"key2\": false,\"key3\": null,\"key4\": \"value\",\"key5\": 101}",
+                JsonObject(mutableMapOf(
+                    "key1" to JsonBoolean(true),
+                    "key2" to JsonBoolean(false),
+                    "key3" to JsonNull(),
+                    "key4" to JsonString("value"),
+                    "key5" to JsonNumber(101))))
         )
     }
 
