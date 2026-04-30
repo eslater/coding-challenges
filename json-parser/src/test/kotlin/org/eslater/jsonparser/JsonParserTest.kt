@@ -10,47 +10,19 @@ import kotlin.test.assertEquals
 
 class JsonParserTest {
 
-    @ParameterizedTest
-    @ValueSource(strings = [
-        "{\"key\":\"value\"}",
-        "{   \"key\":\"value\"    }",
-        "   {\"key\":\"value\"}  "
-    ])
-    fun `should tokenize the input`(json: String) {
-        var tokens: List<Token> = JsonParser().tokenize(json)
-        var expected: List<Token> = listOf(
-            Token(TokenType.START_OBJECT, "{"),
-            Token(TokenType.STRING, "key"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.STRING, "value"),
-            Token(TokenType.END_OBJECT, "}"))
-            assertEquals(expected, tokens)
-    }
-
     @Test
-    fun `should handle escaped quotes in a string`() {
-        val json = "{\"key\":\"foo\\\"bar\"}"
-        var tokens: List<Token> = JsonParser().tokenize(json)
-        var expected: List<Token> = listOf(
-            Token(TokenType.START_OBJECT, "{"),
-            Token(TokenType.STRING, "key"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.STRING, """foo"bar"""),
-            Token(TokenType.END_OBJECT, "}"))
-        assertEquals(expected, tokens)
-    }
-
-    @Test
-    fun `should handle escaped quotes in a string and escaped backslashes at end`() {
-        val json = """{"key":"foo\"bar\\"}"""
-        var tokens: List<Token> = JsonParser().tokenize(json)
-        var expected: List<Token> = listOf(
-            Token(TokenType.START_OBJECT, "{"),
-            Token(TokenType.STRING, "key"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.STRING, """foo"bar\"""),
-            Token(TokenType.END_OBJECT, "}"))
-        assertEquals(expected, tokens)
+    fun `should properly parse arrays in JsonArray`() {
+        val json = "{\"key\":[\"foo\", 123, null, true, false]}"
+        val expected = JsonObject(mutableMapOf(
+            "key" to JsonArray(mutableListOf(
+                JsonBoolean(true),
+                JsonBoolean(false),
+                JsonNull(),
+                JsonString("value"),
+                JsonNumber(101)))))
+        val parser = JsonParser()
+        val result: JsonObject = parser.parse(json)
+        assertEquals(expected, result)
     }
 
     @ParameterizedTest

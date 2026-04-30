@@ -2,7 +2,7 @@ package org.eslater.jsonparser
 
 class JsonParser {
     fun parse(json: String): JsonObject {
-        val tokens: List<Token> = tokenize(json)
+        val tokens: List<Token> = Tokenizer().tokenize(json)
         val tokenItr = tokens.iterator()
         val keyValueMap: MutableMap<String, JsonValue> = mutableMapOf()
         var token = getNextTokenAndFailIfNotType(tokenItr, TokenType.START_OBJECT)
@@ -40,103 +40,12 @@ class JsonParser {
             else -> throw JsonParseException("Unexpected token type for Value node: ${token.type}")
         }
     }
-
-    fun tokenize(text: String): List<Token> {
-        val tokens = mutableListOf<Token>()
-        val iterator: Iterator<Char> = text.iterator()
-        val word = StringBuilder()
-
-        fun getEscapeChar(char: Char): String {
-            return when (char) {
-                '\\' -> "\\"
-                '\'' -> "\'"
-                '"' -> "\""
-                'n' -> "\n"
-                't' -> "\t"
-                'r' -> "\r"
-                'b' -> "\b"
-                else -> throw JsonParseException("Unexpected escape sequence in string value")
-            }
-        }
-
-        fun parseBetweenQuotes(): String {
-            var value = StringBuilder()
-            while (iterator.hasNext()) {
-                val char = iterator.next()
-                when(char) {
-                    '\\' -> {
-                        if (!iterator.hasNext()) throw JsonParseException("Unexpected end of input")
-                        value.append(getEscapeChar(iterator.next()))
-                    }
-                    '"' -> {
-                        break
-                    }
-                    else -> {
-                        value.append(char)
-                    }
-                }
-            }
-            return value.toString()
-        }
-
-        fun inferTypeAndCreateToken(word: String): Token {
-            if (word == "null") return Token(TokenType.NULL, word)
-            if (word == "true" || word == "false") return Token(TokenType.BOOL, word)
-            if (word.toLongOrNull() != null) return Token(TokenType.NUMBER, word)
-            throw JsonParseException("value is of an unknown type")
-        }
-
-        var isValue = false
-        while (iterator.hasNext()) {
-            val char: Char = iterator.next()
-            when (char) {
-                '{' -> {
-                    tokens.add(Token(TokenType.START_OBJECT, char.toString()))
-                }
-                '}' -> {
-                    if (isValue) tokens.add(inferTypeAndCreateToken(word.toString()))
-                    isValue = false
-                    word.clear()
-                    tokens.add(Token(TokenType.END_OBJECT, char.toString()))
-                }
-                ':' -> {
-                    tokens.add(Token(TokenType.COLON, char.toString()))
-                    isValue = true
-                }
-                '"' -> {
-                    tokens.add(Token(TokenType.STRING, parseBetweenQuotes()))
-                    if (isValue) isValue = false
-                }
-                ',' -> {
-                    if (isValue) tokens.add(inferTypeAndCreateToken(word.toString()))
-                    isValue = false
-                    word.clear()
-                    tokens.add(Token(TokenType.COMMA, char.toString()))
-                }
-                else -> {
-                    if (char.isWhitespace()) {
-                        continue
-                    } else if (isValue) {
-                        word.append(char)
-                    } else {
-                        throw JsonParseException("unexpected character $char")
-                    }
-                }
-            }
-        }
-        return tokens
-    }
 }
-
-//Token
-enum class TokenType {
-    STRING, COLON, COMMA, START_OBJECT, END_OBJECT, NULL, BOOL, NUMBER
-}
-data class Token(val type: TokenType, val value: String)
 
 //Json
 sealed class JsonValue
 data class JsonObject(var value: MutableMap<String, JsonValue> = mutableMapOf())
+data class JsonArray(var value: MutableList<JsonValue> = mutableListOf()) : JsonValue()
 data class JsonString(val value: String) : JsonValue()
 data class JsonNull(val value: String? = null) : JsonValue()
 data class JsonBoolean(val value: Boolean) : JsonValue()
