@@ -60,7 +60,9 @@ class JsonParser {
     private fun getNextTokenAndFailIfNotType(iterator: Iterator<Token>, type: TokenType): Token {
         if (!iterator.hasNext()) throw JsonParseException("Unexcepted end of input")
         val token = iterator.next();
-        if (token.type != type) throw JsonParseException("unexpected next token, expected $type")
+        if (token.type != type) {
+            throw JsonParseException("unexpected next token, expected $type but got ${token.type}")
+        }
         return token
     }
 

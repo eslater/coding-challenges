@@ -4,7 +4,19 @@ class Tokenizer {
 
     fun tokenize(text: String): List<Token> {
         val iterator: ListIterator<Char> = text.toList().listIterator()
-        return tokenizeObject(iterator)
+        val tokens: List<Token> = tokenizeObject(iterator)
+        checkRemainingCharactersAndErrorIfNotWhiteSpace(iterator)
+        return tokens
+    }
+
+    fun checkRemainingCharactersAndErrorIfNotWhiteSpace(iterator: ListIterator<Char>) {
+        while (iterator.hasNext()) {
+            val char = iterator.next()
+            if (char.isWhitespace() || char == '\n' || char == '\r' || char == '\t') {
+                continue
+            }
+            throw JsonParseException("unexpected trailing tokens")
+        }
     }
 
     private fun tokenizeObject(iterator: ListIterator<Char>): List<Token> {
@@ -17,6 +29,7 @@ class Tokenizer {
                 }
                 '}' -> {
                     tokens.add(Token(TokenType.END_OBJECT, char.toString()))
+                    return tokens;
                 }
                 ':' -> {
                     tokens.add(Token(TokenType.COLON, char.toString()))
@@ -32,11 +45,12 @@ class Tokenizer {
                     continue
                 }
                 else -> {
+                    println("Unexpected character: $char tokens: $tokens")
                     throw JsonParseException("unexpected character $char")
                 }
             }
         }
-        return tokens
+        throw JsonParseException("unexpected end of input")
     }
 
     private fun tokenizeArray(iterator: ListIterator<Char>): List<Token> {
@@ -44,9 +58,11 @@ class Tokenizer {
         while (iterator.hasNext()) {
             when (val char: Char = iterator.next()) {
                 '{' -> {
+                    tokens.add(Token(TokenType.START_OBJECT, char.toString()))
                     tokens.addAll(tokenizeObject(iterator))
                 }
                 '[' -> {
+                    tokens.add(Token(TokenType.START_ARRAY, char.toString()))
                     tokens.addAll(tokenizeArray(iterator))
                 }
                 ']' -> {

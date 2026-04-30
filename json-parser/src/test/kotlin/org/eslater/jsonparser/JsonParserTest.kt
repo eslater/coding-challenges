@@ -48,7 +48,7 @@ class JsonParserTest {
                     "key2" to JsonBoolean(false),
                     "key3" to JsonNull(),
                     "key4" to JsonString("value"),
-                    "key5" to JsonNumber(101))))
+                    "key5" to JsonNumber(101)))),
         )
     }
 
@@ -69,6 +69,57 @@ class JsonParserTest {
         assertThrows<JsonParseException> {
             parser.parse(json)
         }
+    }
+
+    @Test
+    fun `should handle a complex object with lots of nesting`() {
+        val json = """
+            {
+                "key1": true,
+                "key2": false,
+                "key3": null,
+                "key4": ["value", null, ["foo", null], {"foo":"bar"}],
+                "key5": {
+                    "innerKey1": ["value", null, ["bar", null], true],
+                    "innerKey2": "foo",
+                    "innerKey3": {
+                        "veryInnerKey1": "foo",
+                        "veryInnerKey2": [{"foo":[true, false]}]
+                    }
+                }
+            }
+        """
+        val expected = JsonObject(mutableMapOf(
+            "key1" to JsonBoolean(true),
+            "key2" to JsonBoolean(false),
+            "key3" to JsonNull(),
+            "key4" to JsonArray(mutableListOf(
+                JsonString("value"),
+                JsonNull(),
+                JsonArray(mutableListOf(
+                    JsonString("foo"),
+                    JsonNull())),
+                JsonObject(mutableMapOf(
+                    "foo" to JsonString("bar"))))),
+            "key5" to JsonObject(mutableMapOf(
+                "innerKey1" to JsonArray(mutableListOf(
+                    JsonString("value"),
+                    JsonNull(),
+                    JsonArray(mutableListOf(
+                        JsonString("bar"),
+                        JsonNull())),
+                    JsonBoolean(true))),
+                "innerKey2" to JsonString("foo"),
+                "innerKey3" to JsonObject(mutableMapOf(
+                    "veryInnerKey1" to JsonString("foo"),
+                    "veryInnerKey2" to JsonArray(mutableListOf(
+                        JsonObject(mutableMapOf(
+                            "foo" to JsonArray(mutableListOf(
+                                JsonBoolean(true),
+                                JsonBoolean(false)))))))))))))
+
+        val result: JsonObject = JsonParser().parse(json)
+        assertEquals(expected, result)
     }
 
 }

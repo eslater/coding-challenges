@@ -74,6 +74,31 @@ class TokenizerTest {
     }
 
     @Test
+    fun `should properly tokenize a nested array`() {
+        val json = "{\"key\":[\"foo\", true, [123, null], false]}"
+        val tokens: List<Token> = Tokenizer().tokenize(json)
+        val expected: List<Token> = listOf(
+            Token(TokenType.START_OBJECT, "{"),
+            Token(TokenType.STRING, "key"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.START_ARRAY, "["),
+            Token(TokenType.STRING, "foo"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.BOOL, "true"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.START_ARRAY, "["),
+            Token(TokenType.NUMBER, "123"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.NULL, "null"),
+            Token(TokenType.END_ARRAY, "]"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.BOOL, "false"),
+            Token(TokenType.END_ARRAY, "]"),
+            Token(TokenType.END_OBJECT, "}"))
+        assertEquals(expected, tokens)
+    }
+
+    @Test
     fun `should properly a nested object`() {
         val json = "{\"key\":{\"key1\":\"foo\",\"key2\":123,\"key3\":null,\"key4\":true,\"key5\":[false,\"foo\",null, 123]}}"
         val tokens: List<Token> = Tokenizer().tokenize(json)
