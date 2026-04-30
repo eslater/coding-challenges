@@ -15,11 +15,11 @@ class JsonParserTest {
         val json = "{\"key\":[\"foo\", 123, null, true, false]}"
         val expected = JsonObject(mutableMapOf(
             "key" to JsonArray(mutableListOf(
-                JsonBoolean(true),
-                JsonBoolean(false),
+                JsonString("foo"),
+                JsonNumber(123),
                 JsonNull(),
-                JsonString("value"),
-                JsonNumber(101)))))
+                JsonBoolean(true),
+                JsonBoolean(false)))))
         val parser = JsonParser()
         val result: JsonObject = parser.parse(json)
         assertEquals(expected, result)
