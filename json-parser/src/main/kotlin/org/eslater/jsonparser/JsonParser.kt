@@ -24,24 +24,19 @@ class JsonParser {
 
     fun parseObject(iterator: Iterator<Token>): JsonObject {
         val keyValueMap: MutableMap<String, JsonValue> = mutableMapOf()
-        do {
-            val keyToken = getNextTokenAndFailIfNotType(iterator, listOf(TokenType.STRING, TokenType.END_OBJECT))
-            if (keyToken.type == TokenType.END_OBJECT && keyValueMap.isEmpty()) return JsonObject()
-            getNextTokenAndFailIfNotColon(iterator)
-            var token = iterator.next()
-            when(token.type) {
-                TokenType.START_OBJECT -> {
-                    keyValueMap[keyToken.value] = parseObject(iterator)
-                }
-                TokenType.START_ARRAY-> {
-                    keyValueMap[keyToken.value] = parseArray(iterator)
-                }
-                else -> {
-                    keyValueMap[keyToken.value] = getJsonValue(token)
-                }
+        var keyToken = getNextTokenAndFailIfNotType(iterator, listOf(TokenType.STRING, TokenType.END_OBJECT))
+        while(keyToken.type != TokenType.END_OBJECT) {
+            getNextTokenAndFailIfNotType(iterator, TokenType.COLON)
+            val valueToken = iterator.next()
+            keyValueMap[keyToken.value] = when(valueToken.type) {
+                TokenType.START_OBJECT -> parseObject(iterator)
+                TokenType.START_ARRAY-> parseArray(iterator)
+                else -> getJsonValue(valueToken)
             }
-            token = iterator.next() //either comma or end object
-        } while(token.type != TokenType.END_OBJECT)
+            val separator = getNextTokenAndFailIfNotType(iterator, listOf(TokenType.COMMA, TokenType.END_OBJECT))
+            if (separator.type == TokenType.END_OBJECT) break
+            keyToken = getNextTokenAndFailIfNotType(iterator, TokenType.STRING)
+        }
         return JsonObject(keyValueMap)
     }
 
@@ -78,8 +73,8 @@ class JsonParser {
         return token
     }
 
-    private fun getNextTokenAndFailIfNotColon(iterator: Iterator<Token>): Token {
-        return getNextTokenAndFailIfNotType(iterator, listOf(TokenType.COLON))
+    private fun getNextTokenAndFailIfNotType(iterator: Iterator<Token>, type: TokenType): Token {
+        return getNextTokenAndFailIfNotType(iterator, listOf(type))
     }
 
     private fun getNextTokenAndFailIfNotType(iterator: Iterator<Token>, types: List<TokenType>): Token {
