@@ -167,19 +167,19 @@ class Tokenizer {
             'b' -> "\b"
             'f' -> "\u000c"
             '/' -> "/"
-            'u' -> getHexCode(iterator).toInt(16).toChar().toString()
+            'u' -> getUnicodeChar(iterator)
             else -> throw JsonParseException("Unexpected escape sequence in string value: $char")
         }
     }
 
-    fun getHexCode(iterator: ListIterator<Char>): String {
+    fun getUnicodeChar(iterator: ListIterator<Char>): String {
         val hex = StringBuilder()
         while(iterator.hasNext()) {
-            var char = iterator.next()
+            val char = iterator.next()
             hex.append(char)
             if (hex.length == 4) {
                 try {
-                    return hex.toString()
+                    return hex.toString().toInt(16).toChar().toString()
                 } catch (_: NumberFormatException) {
                     throw JsonParseException("Unexpected hex code: $char")
                 }
