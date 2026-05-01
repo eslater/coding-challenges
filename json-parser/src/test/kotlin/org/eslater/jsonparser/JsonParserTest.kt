@@ -27,6 +27,14 @@ class JsonParserTest {
     }
 
     @Test
+    fun `throws error when parsing invalid json with too many commas`() {
+        val json = "[1,,,,2]"
+        assertThrows<JsonParseException> {
+            JsonParser().parse(json)
+        }
+    }
+
+    @Test
     fun `should properly parse arrays in JsonArray`() {
         val json = "{\"key\":[\"foo\", 123, null, true, false]}"
         val expected = JsonObject(mapOf(
