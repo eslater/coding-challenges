@@ -7,7 +7,7 @@ class JsonParser {
     val VALUE_TOKENS = listOf(TokenType.STRING, TokenType.BOOL, TokenType.NULL, TokenType.LONG, TokenType.DOUBLE, TokenType.FLOAT)
 
     fun parse(json: String): JsonValue {
-        if (json.isEmpty()) throw JsonParseException("empty content")
+        if (json.isBlank()) throw JsonParseException("empty content")
         val tokens: List<Token> = Tokenizer().tokenize(json)
         val tokenItr = tokens.iterator()
         val startToken = getNextTokenAndFailIfNotType(tokenItr, START_TOKENS)

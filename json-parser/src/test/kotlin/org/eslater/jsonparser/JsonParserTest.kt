@@ -35,6 +35,15 @@ class JsonParserTest {
     }
 
     @Test
+    fun `should handle unicode escape sequence`() {
+        val json = "{\"foo\":\"\u0041\u0041\u0041\"}"
+        val expected = JsonObject(mapOf(
+            "foo" to JsonString("AAA")))
+        val result: JsonValue = JsonParser().parse(json)
+        assertEquals(expected, result)
+    }
+
+    @Test
     fun `should properly parse arrays in JsonArray`() {
         val json = "{\"key\":[\"foo\", 123, null, true, false]}"
         val expected = JsonObject(mapOf(

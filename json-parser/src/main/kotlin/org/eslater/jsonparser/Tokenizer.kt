@@ -141,7 +141,7 @@ class Tokenizer {
             when(val char = iterator.next()) {
                 '\\' -> {
                     if (!iterator.hasNext()) throw JsonParseException("Unexpected end of input")
-                    value.append(getEscapeChar(iterator.next(), iterator))
+                    value.append(getUnicodeEscapeSequence(iterator.next(), iterator))
                 }
                 '"' -> {
                     break
@@ -157,7 +157,7 @@ class Tokenizer {
         return value.toString()
     }
 
-    fun getEscapeChar(char: Char, iterator: ListIterator<Char>): String {
+    fun getUnicodeEscapeSequence(char: Char, iterator: ListIterator<Char>): String {
         return when (char) {
             '\\' -> "\\"
             '\'' -> "\'"
@@ -168,7 +168,7 @@ class Tokenizer {
             'b' -> "\b"
             'f' -> "\u000c"
             '/' -> "/"
-            'u' -> "\\u" + getHexCode(iterator)
+            'u' -> getHexCode(iterator).toInt(16).toChar().toString()
             else -> throw JsonParseException("Unexpected escape sequence in string value: $char")
         }
     }
@@ -177,11 +177,10 @@ class Tokenizer {
         var hex = StringBuilder()
         while(iterator.hasNext()) {
             var char = iterator.next()
-            if (char == ' ' || char == '\\' || char == '"') {
-                iterator.previous()
+            hex.append(char)
+            if (hex.length == 4) {
                 return hex.toString()
             }
-            hex.append(char)
         }
         throw JsonParseException("unexpected end of input")
     }
