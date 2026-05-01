@@ -41,7 +41,7 @@ class Tokenizer {
                 }
                 '}' -> {
                     tokens.add(Token(TokenType.END_OBJECT, char.toString()))
-                    return tokens;
+                    return tokens
                 }
                 ':' -> {
                     tokens.add(Token(TokenType.COLON, char.toString()))
@@ -178,7 +178,11 @@ class Tokenizer {
             var char = iterator.next()
             hex.append(char)
             if (hex.length == 4) {
-                return hex.toString()
+                try {
+                    return hex.toString()
+                } catch (_: NumberFormatException) {
+                    throw JsonParseException("Unexpected hex code: $char")
+                }
             }
         }
         throw JsonParseException("unexpected end of input")
@@ -189,10 +193,8 @@ class Tokenizer {
         if (word == "true" || word == "false") return Token(TokenType.BOOL, word)
         if (word == "0") return Token(TokenType.LONG, word)
         if (word.startsWith("+")) throw JsonParseException("value is of an unknown type")
-        if (word.startsWith("0.") && word.toFloatOrNull() != null) return Token(TokenType.FLOAT, word)
         if (word.startsWith("0.") && word.toDoubleOrNull() != null) return Token(TokenType.DOUBLE, word)
         if (word.toLongOrNull() != null && !word.startsWith("0")) return Token(TokenType.LONG, word)
-        if (word.toFloatOrNull() != null && !word.startsWith("0")) return Token(TokenType.FLOAT, word)
         if (word.toDoubleOrNull() != null && !word.startsWith("0")) return Token(TokenType.DOUBLE, word)
         throw JsonParseException("value is of an unknown type: $word")
     }
@@ -210,7 +212,6 @@ enum class TokenType {
     NULL,
     BOOL,
     LONG,
-    FLOAT,
     DOUBLE
 }
 data class Token(val type: TokenType, val value: String)

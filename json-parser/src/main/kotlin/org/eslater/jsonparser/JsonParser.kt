@@ -2,9 +2,11 @@ package org.eslater.jsonparser
 
 class JsonParser {
 
-    val START_TOKENS = listOf(TokenType.START_ARRAY, TokenType.START_OBJECT)
-    val END_TOKENS = listOf(TokenType.END_ARRAY, TokenType.END_OBJECT)
-    val VALUE_TOKENS = listOf(TokenType.STRING, TokenType.BOOL, TokenType.NULL, TokenType.LONG, TokenType.DOUBLE, TokenType.FLOAT)
+    companion object {
+        val START_TOKENS = listOf(TokenType.START_ARRAY, TokenType.START_OBJECT)
+        val END_TOKENS = listOf(TokenType.END_ARRAY, TokenType.END_OBJECT)
+        val VALUE_TOKENS = listOf(TokenType.STRING, TokenType.BOOL, TokenType.NULL, TokenType.LONG, TokenType.DOUBLE)
+    }
 
     fun parse(json: String): JsonValue {
         if (json.isBlank()) throw JsonParseException("empty content")
@@ -68,8 +70,8 @@ class JsonParser {
     }
 
     private fun getNextTokenAndFailIfComma(iterator: Iterator<Token>): Token {
-        if (!iterator.hasNext()) throw JsonParseException("Unexcepted end of input")
-        val token = iterator.next();
+        if (!iterator.hasNext()) throw JsonParseException("Unexpected end of input")
+        val token = iterator.next()
         if (token.type == TokenType.COMMA) {
             throw JsonParseException("unexpected comma in array")
         }
@@ -81,10 +83,10 @@ class JsonParser {
     }
 
     private fun getNextTokenAndFailIfNotType(iterator: Iterator<Token>, types: List<TokenType>): Token {
-        if (!iterator.hasNext()) throw JsonParseException("Unexcepted end of input")
-        val token = iterator.next();
+        if (!iterator.hasNext()) throw JsonParseException("Unexpected end of input")
+        val token = iterator.next()
         if (!types.contains(token.type)) {
-            throw JsonParseException("unexpected next token, expected $types but got ${token.type}}")
+            throw JsonParseException("unexpected next token, expected $types but got ${token.type}")
         }
         return token
     }
@@ -94,7 +96,6 @@ class JsonParser {
             TokenType.STRING -> JsonString(token.value)
             TokenType.LONG -> JsonLong(token.value.toLong())
             TokenType.DOUBLE -> JsonDouble(token.value.toDouble())
-            TokenType.FLOAT -> JsonFloat(token.value.toFloat())
             TokenType.BOOL -> JsonBoolean(if (token.value == "true") true else false)
             TokenType.NULL -> JsonNull
             else -> throw JsonParseException("Unexpected token type for Value node: ${token.type}")
@@ -111,6 +112,5 @@ data class JsonString(val value: String) : JsonValue()
 data class JsonBoolean(val value: Boolean) : JsonValue()
 data class JsonLong(val value: Long): JsonNumber()
 data class JsonDouble(val value: Double): JsonNumber()
-data class JsonFloat(val value: Float): JsonNumber()
-object JsonNull: JsonNumber()
+object JsonNull: JsonValue()
 class JsonParseException(message: String) : Exception(message)
