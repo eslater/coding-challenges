@@ -2,10 +2,14 @@ package org.eslater.jsonparser
 
 class JsonParser {
 
+    val START_TOKENS = listOf(TokenType.START_ARRAY, TokenType.START_OBJECT)
+    val END_TOKENS = listOf(TokenType.END_ARRAY, TokenType.END_OBJECT)
+    val VALUE_TOKENS = listOf(TokenType.STRING, TokenType.BOOL, TokenType.NULL, TokenType.NUMBER)
+
     fun parse(json: String): JsonValue {
         val tokens: List<Token> = Tokenizer().tokenize(json)
         val tokenItr = tokens.iterator()
-        val startToken = getStartTokenAndFailIfNotValid(tokenItr)
+        val startToken = getNextTokenAndFailIfNotType(tokenItr, START_TOKENS)
         val parsed = when (startToken.type) {
             TokenType.START_OBJECT -> parseObject(tokenItr)
             TokenType.START_ARRAY-> parseArray(tokenItr)
@@ -39,7 +43,7 @@ class JsonParser {
 
     private fun parseArray(iterator: Iterator<Token>): JsonArray {
         val list = mutableListOf<JsonValue>()
-        var token = iterator.next()
+        var token = getNextTokenAndFailIfNotType(iterator, VALUE_TOKENS + START_TOKENS + END_TOKENS)
         while(token.type != TokenType.END_ARRAY) {
             when(token.type) {
                 TokenType.START_OBJECT -> {
@@ -61,20 +65,15 @@ class JsonParser {
         return JsonArray(list)
     }
 
-    private fun getStartTokenAndFailIfNotValid(iterator: Iterator<Token>): Token {
-        if (!iterator.hasNext()) throw JsonParseException("Unexcepted end of input")
-        val token = iterator.next();
-        if (!listOf(TokenType.START_OBJECT, TokenType.START_ARRAY).contains(token.type)) {
-            throw JsonParseException("unexpected next token, expected START_OBJECT or START_ARRAY but got ${token.type}")
-        }
-        return token
+    private fun getNextTokenAndFailIfNotType(iterator: Iterator<Token>, type: TokenType): Token {
+        return getNextTokenAndFailIfNotType(iterator, listOf(type))
     }
 
-    private fun getNextTokenAndFailIfNotType(iterator: Iterator<Token>, type: TokenType): Token {
+    private fun getNextTokenAndFailIfNotType(iterator: Iterator<Token>, types: List<TokenType>): Token {
         if (!iterator.hasNext()) throw JsonParseException("Unexcepted end of input")
         val token = iterator.next();
-        if (token.type != type) {
-            throw JsonParseException("unexpected next token, expected $type but got ${token.type}")
+        if (!types.contains(token.type)) {
+            throw JsonParseException("unexpected next token, expected $types but got ${token.type}")
         }
         return token
     }

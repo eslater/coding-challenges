@@ -157,7 +157,7 @@ class JsonParserTest {
         "fail15.json",
         "fail16.json",
         "fail17.json",
-        "fail18.json",
+//        "fail1d8.json", --this is enforcing a list depth of 20, which is not part of the json spec.
         "fail19.json",
         "fail20.json",
         "fail21.json",
@@ -189,4 +189,14 @@ class JsonParserTest {
             }
         }
     }
+
+    @Test
+    fun `single file JSON dot org test`() {
+        val fileName = "pass1.json"
+        val text = File("src/test/resources/jsonorgtest/$fileName").readText()
+        var token = Tokenizer().tokenize(text)
+        var parsed = JsonParser().parse(text)
+        assertEquals(JsonObject(mutableMapOf()), parsed)
+    }
+
 }

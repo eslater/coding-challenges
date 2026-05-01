@@ -149,6 +149,9 @@ class Tokenizer {
                 '"' -> {
                     break
                 }
+                '\t', '\n' -> {
+                    throw JsonParseException("illegal character in string")
+                }
                 else -> {
                     value.append(char)
                 }
@@ -173,7 +176,7 @@ class Tokenizer {
     fun inferTypeAndCreateToken(word: String): Token {
         if (word == "null") return Token(TokenType.NULL, word)
         if (word == "true" || word == "false") return Token(TokenType.BOOL, word)
-        if (word.toLongOrNull() != null) return Token(TokenType.NUMBER, word)
+        if (word.toLongOrNull() != null && !word.startsWith("0")) return Token(TokenType.NUMBER, word)
         throw JsonParseException("value is of an unknown type")
     }
 
