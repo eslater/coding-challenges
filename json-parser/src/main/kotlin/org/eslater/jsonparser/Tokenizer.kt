@@ -135,7 +135,7 @@ class Tokenizer {
     }
 
     fun parseBetweenQuotes(iterator: ListIterator<Char>): String {
-        var value = StringBuilder()
+        val value = StringBuilder()
         while (iterator.hasNext()) {
             when(val char = iterator.next()) {
                 '\\' -> {
@@ -173,7 +173,7 @@ class Tokenizer {
     }
 
     fun getHexCode(iterator: ListIterator<Char>): String {
-        var hex = StringBuilder()
+        val hex = StringBuilder()
         while(iterator.hasNext()) {
             var char = iterator.next()
             hex.append(char)
