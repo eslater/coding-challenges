@@ -22,7 +22,7 @@ class Tokenizer {
         return tokens
     }
 
-    fun checkRemainingCharactersAndErrorIfNotWhiteSpace(iterator: ListIterator<Char>) {
+    private fun checkRemainingCharactersAndErrorIfNotWhiteSpace(iterator: ListIterator<Char>) {
         while (iterator.hasNext()) {
             val char = iterator.next()
             if (char == ' ' || char == '\n' || char == '\r' || char == '\t') {
@@ -134,7 +134,7 @@ class Tokenizer {
         throw JsonParseException("unexpected character $word")
     }
 
-    fun parseBetweenQuotes(iterator: ListIterator<Char>): String {
+    private fun parseBetweenQuotes(iterator: ListIterator<Char>): String {
         val value = StringBuilder()
         while (iterator.hasNext()) {
             when(val char = iterator.next()) {
@@ -156,7 +156,7 @@ class Tokenizer {
         return value.toString()
     }
 
-    fun getUnicodeEscapeSequence(char: Char, iterator: ListIterator<Char>): String {
+    private fun getUnicodeEscapeSequence(char: Char, iterator: ListIterator<Char>): String {
         return when (char) {
             '\\' -> "\\"
             '\'' -> "\'"
@@ -172,7 +172,7 @@ class Tokenizer {
         }
     }
 
-    fun getUnicodeChar(iterator: ListIterator<Char>): String {
+    private fun getUnicodeChar(iterator: ListIterator<Char>): String {
         val hex = StringBuilder()
         while(iterator.hasNext()) {
             val char = iterator.next()
@@ -188,7 +188,7 @@ class Tokenizer {
         throw JsonParseException("unexpected end of input")
     }
 
-    fun inferTypeAndCreateToken(word: String): Token {
+    private fun inferTypeAndCreateToken(word: String): Token {
         if (word == "null") return Token(TokenType.NULL, word)
         if (word == "true" || word == "false") return Token(TokenType.BOOL, word)
         if (word == "0") return Token(TokenType.LONG, word)
@@ -198,7 +198,6 @@ class Tokenizer {
         if (word.toDoubleOrNull() != null && !word.startsWith("0")) return Token(TokenType.DOUBLE, word)
         throw JsonParseException("value is of an unknown type: $word")
     }
-
 }
 
 enum class TokenType {

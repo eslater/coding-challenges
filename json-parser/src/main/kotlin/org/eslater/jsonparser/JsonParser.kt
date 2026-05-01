@@ -22,7 +22,7 @@ class JsonParser {
         return parsed
     }
 
-    fun parseObject(iterator: Iterator<Token>): JsonObject {
+    private fun parseObject(iterator: Iterator<Token>): JsonObject {
         val keyValueMap: MutableMap<String, JsonValue> = mutableMapOf()
         var keyToken = getNextTokenAndFailIfNotType(iterator, listOf(TokenType.STRING, TokenType.END_OBJECT))
         while(keyToken.type != TokenType.END_OBJECT) {
