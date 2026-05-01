@@ -36,7 +36,7 @@ class TokenizerTest {
             Token(TokenType.COMMA, ","),
             Token(TokenType.BOOL, "true"),
             Token(TokenType.COMMA, ","),
-            Token(TokenType.NUMBER, "123"),
+            Token(TokenType.LONG, "123"),
             Token(TokenType.END_ARRAY, "]"))
         assertEquals(expected, tokens)
     }
@@ -78,7 +78,7 @@ class TokenizerTest {
             Token(TokenType.START_ARRAY, "["),
             Token(TokenType.STRING, "foo"),
             Token(TokenType.COMMA, ","),
-            Token(TokenType.NUMBER, "123"),
+            Token(TokenType.LONG, "123"),
             Token(TokenType.COMMA, ","),
             Token(TokenType.NULL, "null"),
             Token(TokenType.COMMA, ","),
@@ -104,7 +104,7 @@ class TokenizerTest {
             Token(TokenType.BOOL, "true"),
             Token(TokenType.COMMA, ","),
             Token(TokenType.START_ARRAY, "["),
-            Token(TokenType.NUMBER, "123"),
+            Token(TokenType.LONG, "123"),
             Token(TokenType.COMMA, ","),
             Token(TokenType.NULL, "null"),
             Token(TokenType.END_ARRAY, "]"),
@@ -130,7 +130,7 @@ class TokenizerTest {
             Token(TokenType.COMMA, ","),
             Token(TokenType.STRING, "key2"),
             Token(TokenType.COLON, ":"),
-            Token(TokenType.NUMBER, "123"),
+            Token(TokenType.LONG, "123"),
             Token(TokenType.COMMA, ","),
             Token(TokenType.STRING, "key3"),
             Token(TokenType.COLON, ":"),
@@ -149,7 +149,7 @@ class TokenizerTest {
             Token(TokenType.COMMA, ","),
             Token(TokenType.NULL, "null"),
             Token(TokenType.COMMA, ","),
-            Token(TokenType.NUMBER, "123"),
+            Token(TokenType.LONG, "123"),
             Token(TokenType.END_ARRAY, "]"),
             Token(TokenType.END_OBJECT, "}"),
             Token(TokenType.END_OBJECT, "}"))

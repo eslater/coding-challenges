@@ -138,13 +138,13 @@ class Tokenizer {
         throw JsonParseException("unexpected character $word")
     }
 
-    fun parseBetweenQuotes(iterator: Iterator<Char>): String {
+    fun parseBetweenQuotes(iterator: ListIterator<Char>): String {
         var value = StringBuilder()
         while (iterator.hasNext()) {
             when(val char = iterator.next()) {
                 '\\' -> {
                     if (!iterator.hasNext()) throw JsonParseException("Unexpected end of input")
-                    value.append(getEscapeChar(iterator.next()))
+                    value.append(getEscapeChar(iterator.next(), iterator))
                 }
                 '"' -> {
                     break
@@ -160,7 +160,7 @@ class Tokenizer {
         return value.toString()
     }
 
-    fun getEscapeChar(char: Char): String {
+    fun getEscapeChar(char: Char, iterator: ListIterator<Char>): String {
         return when (char) {
             '\\' -> "\\"
             '\'' -> "\'"
@@ -169,20 +169,52 @@ class Tokenizer {
             't' -> "\t"
             'r' -> "\r"
             'b' -> "\b"
-            else -> throw JsonParseException("Unexpected escape sequence in string value")
+            'f' -> "\u000c"
+            '/' -> "/"
+            'u' -> "\\u" + getHexCode(iterator)
+            else -> throw JsonParseException("Unexpected escape sequence in string value: $char")
         }
+    }
+
+    fun getHexCode(iterator: ListIterator<Char>): String {
+        var hex = StringBuilder()
+        while(iterator.hasNext()) {
+            var char = iterator.next()
+            if (char == ' ' || char == '\\' || char == '"') {
+                iterator.previous()
+                return hex.toString()
+            }
+            hex.append(char)
+        }
+        throw JsonParseException("unexpected end of input")
     }
 
     fun inferTypeAndCreateToken(word: String): Token {
         if (word == "null") return Token(TokenType.NULL, word)
         if (word == "true" || word == "false") return Token(TokenType.BOOL, word)
-        if (word.toLongOrNull() != null && !word.startsWith("0")) return Token(TokenType.NUMBER, word)
-        throw JsonParseException("value is of an unknown type")
+        if (word == "0") return Token(TokenType.LONG, word)
+        if (word.startsWith("0.") && word.toDoubleOrNull() != null) return Token(TokenType.DOUBLE, word)
+        if (word.startsWith("0.") && word.toFloatOrNull() != null) return Token(TokenType.FLOAT, word)
+        if (word.toLongOrNull() != null && !word.startsWith("0")) return Token(TokenType.LONG, word)
+        if (word.toDoubleOrNull() != null && !word.startsWith("0")) return Token(TokenType.DOUBLE, word)
+        if (word.toFloatOrNull() != null && !word.startsWith("0")) return Token(TokenType.FLOAT, word)
+        throw JsonParseException("value is of an unknown type: $word")
     }
 
 }
 
 enum class TokenType {
-    STRING, COLON, COMMA, START_OBJECT, END_OBJECT, NULL, BOOL, NUMBER, START_ARRAY, END_ARRAY
+    START_OBJECT,
+    END_OBJECT,
+    START_ARRAY,
+    END_ARRAY,
+    COLON,
+    COMMA,
+    STRING,
+    NULL,
+    BOOL,
+    LONG,
+    FLOAT,
+    DOUBLE
 }
 data class Token(val type: TokenType, val value: String)

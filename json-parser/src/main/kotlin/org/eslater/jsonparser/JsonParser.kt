@@ -4,7 +4,7 @@ class JsonParser {
 
     val START_TOKENS = listOf(TokenType.START_ARRAY, TokenType.START_OBJECT)
     val END_TOKENS = listOf(TokenType.END_ARRAY, TokenType.END_OBJECT)
-    val VALUE_TOKENS = listOf(TokenType.STRING, TokenType.BOOL, TokenType.NULL, TokenType.NUMBER)
+    val VALUE_TOKENS = listOf(TokenType.STRING, TokenType.BOOL, TokenType.NULL, TokenType.LONG, TokenType.DOUBLE, TokenType.FLOAT)
 
     fun parse(json: String): JsonValue {
         val tokens: List<Token> = Tokenizer().tokenize(json)
@@ -22,7 +22,8 @@ class JsonParser {
     fun parseObject(iterator: Iterator<Token>): JsonObject {
         val keyValueMap: MutableMap<String, JsonValue> = mutableMapOf()
         do {
-            val keyToken = getNextTokenAndFailIfNotType(iterator, TokenType.STRING)
+            val keyToken = getNextTokenAndFailIfNotType(iterator, listOf(TokenType.STRING, TokenType.END_OBJECT))
+            if (keyToken.type == TokenType.END_OBJECT && keyValueMap.isEmpty()) return JsonObject()
             getNextTokenAndFailIfNotType(iterator, TokenType.COLON)
             var token = iterator.next()
             when(token.type) {
@@ -73,7 +74,7 @@ class JsonParser {
         if (!iterator.hasNext()) throw JsonParseException("Unexcepted end of input")
         val token = iterator.next();
         if (!types.contains(token.type)) {
-            throw JsonParseException("unexpected next token, expected $types but got ${token.type}")
+            throw JsonParseException("unexpected next token, expected $types but got ${token.type}}")
         }
         return token
     }
@@ -81,7 +82,9 @@ class JsonParser {
     private fun getJsonValue(token: Token): JsonValue {
         return when (token.type) {
             TokenType.STRING -> JsonString(token.value)
-            TokenType.NUMBER -> JsonNumber(token.value.toLong())
+            TokenType.LONG -> JsonLong(token.value.toLong())
+            TokenType.DOUBLE -> JsonDouble(token.value.toDouble())
+            TokenType.FLOAT -> JsonFloat(token.value.toFloat())
             TokenType.BOOL -> JsonBoolean(if (token.value == "true") true else false)
             TokenType.NULL -> JsonNull()
             else -> throw JsonParseException("Unexpected token type for Value node: ${token.type}")
@@ -91,10 +94,13 @@ class JsonParser {
 
 //Json
 sealed class JsonValue
+sealed class JsonNumber: JsonValue()
 data class JsonObject(var value: MutableMap<String, JsonValue> = mutableMapOf()) : JsonValue()
 data class JsonArray(var value: MutableList<JsonValue> = mutableListOf()) : JsonValue()
 data class JsonString(val value: String) : JsonValue()
 data class JsonNull(val value: String? = null) : JsonValue()
 data class JsonBoolean(val value: Boolean) : JsonValue()
-data class JsonNumber(val value: Long) : JsonValue()
+data class JsonLong(val value: Long): JsonNumber()
+data class JsonDouble(val value: Double): JsonNumber()
+data class JsonFloat(val value: Float): JsonNumber()
 class JsonParseException(message: String) : Exception(message)

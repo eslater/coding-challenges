@@ -13,12 +13,26 @@ import kotlin.test.assertEquals
 class JsonParserTest {
 
     @Test
+    fun `handles empty object`() {
+        val json = "{}"
+        val result: JsonValue = JsonParser().parse(json)
+        assertEquals(JsonObject(mutableMapOf()), result)
+    }
+
+    @Test
+    fun `handles empty list`() {
+        val json = "[]"
+        val result: JsonValue = JsonParser().parse(json)
+        assertEquals(JsonArray(mutableListOf()), result)
+    }
+
+    @Test
     fun `should properly parse arrays in JsonArray`() {
         val json = "{\"key\":[\"foo\", 123, null, true, false]}"
         val expected = JsonObject(mutableMapOf(
             "key" to JsonArray(mutableListOf(
                 JsonString("foo"),
-                JsonNumber(123),
+                JsonLong(123),
                 JsonNull(),
                 JsonBoolean(true),
                 JsonBoolean(false)))))
@@ -50,7 +64,7 @@ class JsonParserTest {
                     "key2" to JsonBoolean(false),
                     "key3" to JsonNull(),
                     "key4" to JsonString("value"),
-                    "key5" to JsonNumber(101)))),
+                    "key5" to JsonLong(101)))),
         )
     }
 
@@ -129,7 +143,7 @@ class JsonParserTest {
         val json = "[\"foo\", 123, null, true, false]"
         val expected = JsonArray(mutableListOf(
             JsonString("foo"),
-            JsonNumber(123),
+            JsonLong(123),
             JsonNull(),
             JsonBoolean(true),
             JsonBoolean(false)))
@@ -189,14 +203,4 @@ class JsonParserTest {
             }
         }
     }
-
-    @Test
-    fun `single file JSON dot org test`() {
-        val fileName = "pass1.json"
-        val text = File("src/test/resources/jsonorgtest/$fileName").readText()
-        var token = Tokenizer().tokenize(text)
-        var parsed = JsonParser().parse(text)
-        assertEquals(JsonObject(mutableMapOf()), parsed)
-    }
-
 }
