@@ -190,11 +190,11 @@ class Tokenizer {
         if (word == "null") return Token(TokenType.NULL, word)
         if (word == "true" || word == "false") return Token(TokenType.BOOL, word)
         if (word == "0") return Token(TokenType.LONG, word)
-        if (word.startsWith("0.") && word.toDoubleOrNull() != null) return Token(TokenType.DOUBLE, word)
         if (word.startsWith("0.") && word.toFloatOrNull() != null) return Token(TokenType.FLOAT, word)
+        if (word.startsWith("0.") && word.toDoubleOrNull() != null) return Token(TokenType.DOUBLE, word)
         if (word.toLongOrNull() != null && !word.startsWith("0")) return Token(TokenType.LONG, word)
-        if (word.toDoubleOrNull() != null && !word.startsWith("0")) return Token(TokenType.DOUBLE, word)
         if (word.toFloatOrNull() != null && !word.startsWith("0")) return Token(TokenType.FLOAT, word)
+        if (word.toDoubleOrNull() != null && !word.startsWith("0")) return Token(TokenType.DOUBLE, word)
         throw JsonParseException("value is of an unknown type: $word")
     }
 

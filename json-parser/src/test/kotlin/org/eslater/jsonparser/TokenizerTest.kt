@@ -29,8 +29,7 @@ class TokenizerTest {
     fun `should not accept numbers with whitespace in them`() {
         val json = "{\"foo\": 2 3}"
         assertThrows<JsonParseException> {
-            var token = Tokenizer().tokenize(json)
-            token = emptyList()
+            Tokenizer().tokenize(json)
         }
     }
 

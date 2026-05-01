@@ -95,8 +95,8 @@ class JsonParser {
 //Json
 sealed class JsonValue
 sealed class JsonNumber: JsonValue()
-data class JsonObject(var value: MutableMap<String, JsonValue> = mutableMapOf()) : JsonValue()
-data class JsonArray(var value: MutableList<JsonValue> = mutableListOf()) : JsonValue()
+data class JsonObject(var value: Map<String, JsonValue> = mapOf()) : JsonValue()
+data class JsonArray(var value: List<JsonValue> = listOf()) : JsonValue()
 data class JsonString(val value: String) : JsonValue()
 data class JsonNull(val value: String? = null) : JsonValue()
 data class JsonBoolean(val value: Boolean) : JsonValue()

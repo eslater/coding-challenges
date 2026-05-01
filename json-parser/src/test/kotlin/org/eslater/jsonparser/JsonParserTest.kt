@@ -16,21 +16,21 @@ class JsonParserTest {
     fun `handles empty object`() {
         val json = "{}"
         val result: JsonValue = JsonParser().parse(json)
-        assertEquals(JsonObject(mutableMapOf()), result)
+        assertEquals(JsonObject(mapOf()), result)
     }
 
     @Test
     fun `handles empty list`() {
         val json = "[]"
         val result: JsonValue = JsonParser().parse(json)
-        assertEquals(JsonArray(mutableListOf()), result)
+        assertEquals(JsonArray(listOf()), result)
     }
 
     @Test
     fun `should properly parse arrays in JsonArray`() {
         val json = "{\"key\":[\"foo\", 123, null, true, false]}"
-        val expected = JsonObject(mutableMapOf(
-            "key" to JsonArray(mutableListOf(
+        val expected = JsonObject(mapOf(
+            "key" to JsonArray(listOf(
                 JsonString("foo"),
                 JsonLong(123),
                 JsonNull(),
@@ -53,13 +53,13 @@ class JsonParserTest {
         @JvmStatic
         fun jsonDocs() = listOf(
             Arguments.of("{\"key\":\"value\"}",
-                JsonObject(mutableMapOf("key" to JsonString("value")))),
+                JsonObject(mapOf("key" to JsonString("value")))),
             Arguments.of( "{\"key\":\"\"}",
-                JsonObject(mutableMapOf("key" to JsonString("")))),
+                JsonObject(mapOf("key" to JsonString("")))),
             Arguments.of( "{\"key\":\"value\",\"foo\":\"bar\"}",
-                JsonObject(mutableMapOf("key" to JsonString("value"), "foo" to JsonString("bar")))),
+                JsonObject(mapOf("key" to JsonString("value"), "foo" to JsonString("bar")))),
             Arguments.of("{\"key1\": true,\"key2\": false,\"key3\": null,\"key4\": \"value\",\"key5\": 101}",
-                JsonObject(mutableMapOf(
+                JsonObject(mapOf(
                     "key1" to JsonBoolean(true),
                     "key2" to JsonBoolean(false),
                     "key3" to JsonNull(),
@@ -105,32 +105,32 @@ class JsonParserTest {
                 }
             }
         """
-        val expected = JsonObject(mutableMapOf(
+        val expected = JsonObject(mapOf(
             "key1" to JsonBoolean(true),
             "key2" to JsonBoolean(false),
             "key3" to JsonNull(),
-            "key4" to JsonArray(mutableListOf(
+            "key4" to JsonArray(listOf(
                 JsonString("value"),
                 JsonNull(),
-                JsonArray(mutableListOf(
+                JsonArray(listOf(
                     JsonString("foo"),
                     JsonNull())),
-                JsonObject(mutableMapOf(
+                JsonObject(mapOf(
                     "foo" to JsonString("bar"))))),
-            "key5" to JsonObject(mutableMapOf(
-                "innerKey1" to JsonArray(mutableListOf(
+            "key5" to JsonObject(mapOf(
+                "innerKey1" to JsonArray(listOf(
                     JsonString("value"),
                     JsonNull(),
-                    JsonArray(mutableListOf(
+                    JsonArray(listOf(
                         JsonString("bar"),
                         JsonNull())),
                     JsonBoolean(true))),
                 "innerKey2" to JsonString("foo"),
-                "innerKey3" to JsonObject(mutableMapOf(
+                "innerKey3" to JsonObject(mapOf(
                     "veryInnerKey1" to JsonString("foo"),
-                    "veryInnerKey2" to JsonArray(mutableListOf(
-                        JsonObject(mutableMapOf(
-                            "foo" to JsonArray(mutableListOf(
+                    "veryInnerKey2" to JsonArray(listOf(
+                        JsonObject(mapOf(
+                            "foo" to JsonArray(listOf(
                                 JsonBoolean(true),
                                 JsonBoolean(false)))))))))))))
 
@@ -141,7 +141,7 @@ class JsonParserTest {
     @Test
     fun `should parse json array as the start token`() {
         val json = "[\"foo\", 123, null, true, false]"
-        val expected = JsonArray(mutableListOf(
+        val expected = JsonArray(listOf(
             JsonString("foo"),
             JsonLong(123),
             JsonNull(),
