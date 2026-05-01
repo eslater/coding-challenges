@@ -105,7 +105,7 @@ class Tokenizer {
                     return listOf(Token(TokenType.STRING, parseBetweenQuotes(iterator)))
                 }
                 ',' -> {
-                    return listOf(inferTypeAndCreateToken(word.toString()),
+                    return listOf(inferTypeAndCreateToken(word.trim().toString()),
                         Token(TokenType.COMMA, char.toString()))
                 }
                 '[' -> {
@@ -122,14 +122,11 @@ class Tokenizer {
                 }
                 ']' -> {
                     iterator.previous() //we don't want to process END_ARRAY here
-                    return listOf(inferTypeAndCreateToken(word.toString()))
+                    return listOf(inferTypeAndCreateToken(word.trim().toString()))
                 }
                 '}' -> {
                     iterator.previous() //we don't want to process END_OBJECT here
-                    return listOf(inferTypeAndCreateToken(word.toString()))
-                }
-                ' ', '\n', '\t', '\r' -> {
-                    continue
+                    return listOf(inferTypeAndCreateToken(word.trim().toString()))
                 } else -> {
                     word.append(char)
                 }

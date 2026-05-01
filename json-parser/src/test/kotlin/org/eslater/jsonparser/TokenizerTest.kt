@@ -1,5 +1,6 @@
 package org.eslater.jsonparser
 
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import kotlin.test.Test
@@ -22,6 +23,15 @@ class TokenizerTest {
             Token(TokenType.STRING, "value"),
             Token(TokenType.END_OBJECT, "}"))
         assertEquals(expected, tokens)
+    }
+
+    @Test
+    fun `should not accept numbers with whitespace in them`() {
+        val json = "{\"foo\": 2 3}"
+        assertThrows<JsonParseException> {
+            var token = Tokenizer().tokenize(json)
+            token = emptyList()
+        }
     }
 
     @Test
