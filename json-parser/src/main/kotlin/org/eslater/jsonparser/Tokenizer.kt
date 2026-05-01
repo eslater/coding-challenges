@@ -25,7 +25,7 @@ class Tokenizer {
     fun checkRemainingCharactersAndErrorIfNotWhiteSpace(iterator: ListIterator<Char>) {
         while (iterator.hasNext()) {
             val char = iterator.next()
-            if (char.isWhitespace() || char == '\n' || char == '\r' || char == '\t') {
+            if (char == ' ' || char == '\n' || char == '\r' || char == '\t') {
                 continue
             }
             throw JsonParseException("unexpected trailing tokens")
@@ -57,7 +57,6 @@ class Tokenizer {
                     continue
                 }
                 else -> {
-                    println("Unexpected character: $char tokens: $tokens")
                     throw JsonParseException("unexpected character $char")
                 }
             }
@@ -189,6 +188,7 @@ class Tokenizer {
         if (word == "null") return Token(TokenType.NULL, word)
         if (word == "true" || word == "false") return Token(TokenType.BOOL, word)
         if (word == "0") return Token(TokenType.LONG, word)
+        if (word.startsWith("+")) throw JsonParseException("value is of an unknown type")
         if (word.startsWith("0.") && word.toFloatOrNull() != null) return Token(TokenType.FLOAT, word)
         if (word.startsWith("0.") && word.toDoubleOrNull() != null) return Token(TokenType.DOUBLE, word)
         if (word.toLongOrNull() != null && !word.startsWith("0")) return Token(TokenType.LONG, word)

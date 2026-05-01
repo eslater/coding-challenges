@@ -96,7 +96,7 @@ class JsonParser {
             TokenType.DOUBLE -> JsonDouble(token.value.toDouble())
             TokenType.FLOAT -> JsonFloat(token.value.toFloat())
             TokenType.BOOL -> JsonBoolean(if (token.value == "true") true else false)
-            TokenType.NULL -> JsonNull()
+            TokenType.NULL -> JsonNull
             else -> throw JsonParseException("Unexpected token type for Value node: ${token.type}")
         }
     }
@@ -108,9 +108,9 @@ sealed class JsonNumber: JsonValue()
 data class JsonObject(var value: Map<String, JsonValue> = mapOf()) : JsonValue()
 data class JsonArray(var value: List<JsonValue> = listOf()) : JsonValue()
 data class JsonString(val value: String) : JsonValue()
-data class JsonNull(val value: String? = null) : JsonValue()
 data class JsonBoolean(val value: Boolean) : JsonValue()
 data class JsonLong(val value: Long): JsonNumber()
 data class JsonDouble(val value: Double): JsonNumber()
 data class JsonFloat(val value: Float): JsonNumber()
+object JsonNull: JsonNumber()
 class JsonParseException(message: String) : Exception(message)

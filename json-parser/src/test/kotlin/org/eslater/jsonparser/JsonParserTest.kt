@@ -35,6 +35,14 @@ class JsonParserTest {
     }
 
     @Test
+    fun `does not accept +1, though its valid in kotlin`() {
+        val json = "[+1]"
+        assertThrows<JsonParseException> {
+            JsonParser().parse(json)
+        }
+    }
+
+    @Test
     fun `should handle unicode escape sequence`() {
         val json = "{\"foo\":\"\u0041\u0041\u0041\"}"
         val expected = JsonObject(mapOf(
@@ -50,7 +58,7 @@ class JsonParserTest {
             "key" to JsonArray(listOf(
                 JsonString("foo"),
                 JsonLong(123),
-                JsonNull(),
+                JsonNull,
                 JsonBoolean(true),
                 JsonBoolean(false)))))
         val parser = JsonParser()
@@ -79,7 +87,7 @@ class JsonParserTest {
                 JsonObject(mapOf(
                     "key1" to JsonBoolean(true),
                     "key2" to JsonBoolean(false),
-                    "key3" to JsonNull(),
+                    "key3" to JsonNull,
                     "key4" to JsonString("value"),
                     "key5" to JsonLong(101)))),
         )
@@ -125,22 +133,22 @@ class JsonParserTest {
         val expected = JsonObject(mapOf(
             "key1" to JsonBoolean(true),
             "key2" to JsonBoolean(false),
-            "key3" to JsonNull(),
+            "key3" to JsonNull,
             "key4" to JsonArray(listOf(
                 JsonString("value"),
-                JsonNull(),
+                JsonNull,
                 JsonArray(listOf(
                     JsonString("foo"),
-                    JsonNull())),
+                    JsonNull)),
                 JsonObject(mapOf(
                     "foo" to JsonString("bar"))))),
             "key5" to JsonObject(mapOf(
                 "innerKey1" to JsonArray(listOf(
                     JsonString("value"),
-                    JsonNull(),
+                    JsonNull,
                     JsonArray(listOf(
                         JsonString("bar"),
-                        JsonNull())),
+                        JsonNull)),
                     JsonBoolean(true))),
                 "innerKey2" to JsonString("foo"),
                 "innerKey3" to JsonObject(mapOf(
@@ -161,7 +169,7 @@ class JsonParserTest {
         val expected = JsonArray(listOf(
             JsonString("foo"),
             JsonLong(123),
-            JsonNull(),
+            JsonNull,
             JsonBoolean(true),
             JsonBoolean(false)))
         val parser = JsonParser()
